@@ -1,14 +1,18 @@
-pub trait ArrayWindowsExt<I: Iterator, const N: usize> {
-    fn array_windows(self) -> ArrayWindows<I, N>;
+pub trait ArrayWindowsExt {
+    type Iter<const N: usize>: Iterator;
+
+    fn array_windows<const N: usize>(self) -> Self::Iter<N>;
 }
 
-impl<I, const N: usize> ArrayWindowsExt<Self, N> for I
+impl<I> ArrayWindowsExt for I
 where
     I: Iterator,
     <I as Iterator>::Item: Clone,
-    Self: Sized,
 {
-    fn array_windows(mut self) -> ArrayWindows<Self, N> {
+    type Iter<const N: usize> = ArrayWindows<Self, N>;
+
+    /// Iterate over windows of size N
+    fn array_windows<const N: usize>(mut self) -> ArrayWindows<Self, N> {
         // TODO: don't use a vec?
         let mut res = Vec::with_capacity(N);
         for _ in 0..N {
